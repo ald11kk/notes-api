@@ -1,5 +1,6 @@
 import asyncio
 from logging.config import fileConfig
+from app.config import settings
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
@@ -11,6 +12,8 @@ from app.database import Base
 from app.models import Note
 
 config = context.config
+section = config.config_ini_section
+config.set_section_option(section, "sqlalchemy.url", settings.DATABASE_URL)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
