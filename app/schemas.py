@@ -17,3 +17,8 @@ class Note(NoteBase):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+# Схема для обновления заметки
+class NoteUpdate(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None

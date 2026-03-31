@@ -37,6 +37,25 @@ async def read_note(note_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Note not found")
     return note
 
+from app.schemas import Note, NoteCreate, NoteUpdate # Обнови импорт!
+
+# 5. Обновление заметки методом PATCH
+@app.patch("/notes/{note_id}", response_model=Note)
+async def update_note(note_id: int, note_data: NoteUpdate, db: AsyncSession = Depends(get_db)):
+    result = await db.execute(select(NoteModel).where(NoteModel.id == note_id))
+    note = result.scalar_one_or_none()
+    
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found")
+
+    update_data = note_data.model_dump(exclude_unset=True) 
+    for key, value in update_data.items():
+        setattr(note, key, value)
+
+    await db.commit()
+    await db.refresh(note)
+    return note
+
 # 4. Удаление заметки
 @app.delete("/notes/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_note(note_id: int, db: AsyncSession = Depends(get_db)):
